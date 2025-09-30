@@ -1,7 +1,7 @@
 # Fit-the-ARMA-model-for-any-data-set
 
-### DEVELOPED BY: PRAJAN P
-### REGISTER NO: 212223240121
+### DEVELOPED BY: SACHIN M
+### REGISTER NO: 212223040177
 
 # AIM:
 To implement ARMA model in python.
