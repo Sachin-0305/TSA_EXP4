@@ -1,26 +1,29 @@
-# Fit-the-ARMA-model-for-any-data-set
+# Ex.No:04   FIT ARMA MODEL FOR TIME SERIES
+# Date: 4/10/2025
 
-### DEVELOPED BY: SACHIN M
-### REGISTER NO: 212223040177
 
-# AIM:
+
+### AIM:
 To implement ARMA model in python.
-
-# ALGORITHM:
+### ALGORITHM:
 1. Import necessary libraries.
-
 2. Set up matplotlib settings for figure size.
+3. Define an ARMA(1,1) process with coefficients ar1 and ma1, and generate a sample of 1000
 
-3. Define an ARMA(1,1) process with coefficients ar1 and ma1, and generate a sample of 1000 data points using the ArmaProcess class. Plot the generated time series and set the title and x- axis limits.
+data points using the ArmaProcess class. Plot the generated time series and set the title and x-
+axis limits.
 
-4. Display the autocorrelation and partial autocorrelation plots for the ARMA(1,1) process using plot_acf and plot_pacf.
+4. Display the autocorrelation and partial autocorrelation plots for the ARMA(1,1) process using
+plot_acf and plot_pacf.
+5. Define an ARMA(2,2) process with coefficients ar2 and ma2, and generate a sample of 10000
 
-5. Define an ARMA(2,2) process with coefficients ar2 and ma2, and generate a sample of 10000 data points using the ArmaProcess class. Plot the generated time series and set the title and x- axis limits.
+data points using the ArmaProcess class. Plot the generated time series and set the title and x-
+axis limits.
 
-6. Display the autocorrelation and partial autocorrelation plots for the ARMA(2,2) process using plot_acf and plot_pacf.
-
-# PROGRAM:
-
+6. Display the autocorrelation and partial autocorrelation plots for the ARMA(2,2) process using
+plot_acf and plot_pacf.
+### PROGRAM:
+Import Necessary Libraries:
 ```
 import pandas as pd
 import numpy as np
@@ -28,110 +31,117 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.arima_process import ArmaProcess
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-import warnings
-warnings.filterwarnings("ignore")
-
-data = pd.read_csv("results.csv")
-data['date'] = pd.to_datetime(data['date'])
-
-yearly_scores = data.groupby(data['date'].dt.year)['home_score'].mean().reset_index()
-yearly_scores.rename(columns={'date': 'year', 'home_score': 'avg_home_score'}, inplace=True)
-
-X = yearly_scores['avg_home_score'].dropna().values
+```
+Load dataset:
+```
+data = pd.read_csv("GoogleStockPrices.csv")
+print(data.head())
+```
+Declare required variables and set figure size, and visualise the data:
+```
+X = data['Close']   
 N = 1000
-
-plt.figure(figsize=(12, 6))
-plt.plot(yearly_scores['year'], X, marker='o')
-plt.title('Yearly Average Home Scores')
-plt.xlabel("Year")
-plt.ylabel("Avg Home Score")
-plt.grid(True)
+plt.rcParams['figure.figsize'] = [12, 6]
+plt.plot(X)
+plt.title('Google Stock Prices (Original Data)')
 plt.show()
-
-plt.figure(figsize=(12, 6))
 plt.subplot(2, 1, 1)
 plot_acf(X, lags=len(X)//4, ax=plt.gca())
 plt.title('Original Data ACF')
-
 plt.subplot(2, 1, 2)
 plot_pacf(X, lags=len(X)//4, ax=plt.gca())
 plt.title('Original Data PACF')
 plt.tight_layout()
 plt.show()
-
+```
+Fitting the ARMA(1,1) model and deriving parameters:
+```
 arma11_model = ARIMA(X, order=(1, 0, 1)).fit()
-phi1_arma11 = arma11_model.arparams[0]
-theta1_arma11 = arma11_model.maparams[0]
-
+phi1_arma11 = arma11_model.params['ar.L1']
+theta1_arma11 = arma11_model.params['ma.L1']
+```
+Simulate ARMA(1,1) Process:
+```
 ar1 = np.array([1, -phi1_arma11])
 ma1 = np.array([1, theta1_arma11])
 ARMA_1 = ArmaProcess(ar1, ma1).generate_sample(nsample=N)
-
-plt.figure(figsize=(12, 6))
 plt.plot(ARMA_1)
 plt.title('Simulated ARMA(1,1) Process')
 plt.xlim([0, 500])
 plt.show()
-
-plt.figure(figsize=(12, 6))
-plt.subplot(2, 1, 1)
-plot_acf(ARMA_1, lags=40, ax=plt.gca())
-plt.title("ACF of Simulated ARMA(1,1)")
-
-plt.subplot(2, 1, 2)
-plot_pacf(ARMA_1, lags=40, ax=plt.gca())
-plt.title("PACF of Simulated ARMA(1,1)")
+```
+Plot ACF and PACF for ARMA(1,1):
+```
+plot_acf(ARMA_1)
+plt.show()
+plot_pacf(ARMA_1)
+plt.show()
+```
+Fitting the ARMA(2,2) model and deriving parameters:
+```
+arma22_model = ARIMA(X, order=(2, 0, 2)).fit()
+phi1_arma22 = arma22_model.params['ar.L1']
+phi2_arma22 = arma22_model.params['ar.L2']
+theta1_arma22 = arma22_model.params['ma.L1']
+theta2_arma22 = arma22_model.params['ma.L2']
+```
+Simulate ARMA(2,2) Process:
+```
+ar2 = np.array([1, -phi1_arma22, -phi2_arma22])  
+ma2 = np.array([1, theta1_arma22, theta2_arma22])  
+ARMA_2 = ArmaProcess(ar2, ma2).generate_sample(nsample=N*10)
+plt.plot(ARMA_2)
+plt.title('Simulated ARMA(2,2) Process')
+plt.xlim([0, 500])
+plt.show()
+```
+Plot ACF and PACF for ARMA(2,2):
+```
+plot_acf(ARMA_2)
+plt.show()
+plot_pacf(ARMA_2)
+plt.show()
 ```
 
+### OUTPUT:
+Original data:
+
+<img width="936" height="501" alt="image" src="https://github.com/user-attachments/assets/cc4e3200-76ed-4c3b-8dc3-17e94a8db9c5" />
+
+Partial Autocorrelation:
+<img width="942" height="231" alt="image" src="https://github.com/user-attachments/assets/3278a56c-c85c-4aa6-8d45-e4e6af71eb9f" />
+
+Autocorrelation:
+<img width="943" height="243" alt="image" src="https://github.com/user-attachments/assets/a467bdd3-cab6-4918-ae3a-8549c34b2ae0" />
+
+SIMULATED ARMA(1,1) PROCESS:
+
+<img width="934" height="504" alt="image" src="https://github.com/user-attachments/assets/62e76753-b783-4fb2-8ca5-1d1564f167ef" />
+
+Partial Autocorrelation:
+
+<img width="956" height="480" alt="image" src="https://github.com/user-attachments/assets/f0a46516-6888-4028-85c4-c3581a3137b1" />
+
+Autocorrelation:
+
+<img width="938" height="494" alt="image" src="https://github.com/user-attachments/assets/9df8545a-2ac0-4d7c-97c9-20074a7b45b0" />
 
 
 
 
+SIMULATED ARMA(2,2) PROCESS:
 
-# OUTPUT:
+<img width="932" height="487" alt="image" src="https://github.com/user-attachments/assets/5735cfdb-9d11-48b4-9672-61ee8730106a" />
 
-## Original data:
+Partial Autocorrelation:
 
-<img width="1290" height="669" alt="Screenshot 2025-09-15 160231" src="https://github.com/user-attachments/assets/6ee8de63-b37d-4d19-9d16-cecf63e21276" />
-
-## Autocorrelation:
-
-<img width="1381" height="349" alt="Screenshot 2025-09-15 160321" src="https://github.com/user-attachments/assets/2570ae48-74c2-482a-a683-26f9eb6a7512" />
-
-## Partial Autocorrelation:
-
-<img width="1370" height="349" alt="Screenshot 2025-09-15 160407" src="https://github.com/user-attachments/assets/e33c24d5-2709-453b-abac-829b69706a5d" />
-
-
-## SIMULATED ARMA(1,1) PROCESS:
-
-<img width="1251" height="650" alt="Screenshot 2025-09-15 160443" src="https://github.com/user-attachments/assets/5c409d5f-6730-48a2-bbc9-68ecbb6625a2" />
-
-
-## Autocorrelation:
-
-<img width="1256" height="662" alt="Screenshot 2025-09-15 160513" src="https://github.com/user-attachments/assets/3c75e582-c7d0-45cf-aa74-d95990fdc70b" />
-
-
-## Partial Autocorrelation:
-
-<img width="1266" height="658" alt="Screenshot 2025-09-15 160547" src="https://github.com/user-attachments/assets/450e9a13-4faf-4c63-bd3b-c285f05131c8" />
-
-
-## SIMULATED ARMA(2,2) PROCESS:
-
-<img width="1248" height="652" alt="Screenshot 2025-09-15 160612" src="https://github.com/user-attachments/assets/e26664b7-6c77-4f99-b012-12096692a8e9" />
+<img width="936" height="498" alt="image" src="https://github.com/user-attachments/assets/a0349bbe-def2-4c64-9df5-1a461293ac98" />
 
 
 
-## Autocorrelation:
+Autocorrelation:
 
-<img width="1242" height="644" alt="Screenshot 2025-09-15 160643" src="https://github.com/user-attachments/assets/1da60fe5-1964-4b84-9fc9-a55ab66ba1aa" />
+<img width="948" height="489" alt="image" src="https://github.com/user-attachments/assets/7cfeb5ad-db1b-4838-93f2-e379e061bb59" />
 
-## Partial Autocorrelation:
-
-<img width="1265" height="649" alt="Screenshot 2025-09-15 160808" src="https://github.com/user-attachments/assets/42185c8b-58bc-4749-8372-0da43c92b133" />
-
-
-# RESULT:
+### RESULT:
 Thus, a python program is created to fir ARMA Model successfully.
